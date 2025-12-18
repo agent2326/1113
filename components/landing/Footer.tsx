@@ -1,0 +1,146 @@
+
+import React from 'react';
+import { FooterConfig, DesignConfig, TypographySettings } from '../../types';
+import Reveal from './Reveal';
+
+interface Props {
+  data: FooterConfig;
+  theme: string;
+  fontHeading: string;
+  fontBody: string;
+  secondaryColor: string;
+  enableAnimations: boolean;
+  isActive?: boolean;
+  design?: DesignConfig;
+  onSelect?: () => void;
+}
+
+const getTypographyStyle = (settings?: TypographySettings, defaultFont?: string) => ({
+    fontFamily: settings?.fontFamily || defaultFont,
+    fontWeight: settings?.fontWeight,
+    fontSize: settings?.fontSize ? `${settings.fontSize}px` : undefined,
+    lineHeight: settings?.lineHeight,
+    letterSpacing: settings?.letterSpacing ? `${settings.letterSpacing}em` : undefined,
+    textTransform: settings?.textTransform,
+    color: settings?.color
+});
+
+const Footer: React.FC<Props> = ({ data, theme, fontHeading, fontBody, secondaryColor, enableAnimations, isActive, design, onSelect }) => {
+  if (!data.show) return null;
+
+  const isHighContrast = theme.includes('high-contrast');
+  const isHighContrastDark = theme === 'high-contrast-dark';
+  const isHighContrastLight = theme === 'high-contrast-light';
+  const isDark = theme === 'dark' || isHighContrastDark || theme === 'midnight';
+
+  let defaultBg = '#111827';
+  let defaultText = 'white';
+  let borderTop = '';
+
+  if (isHighContrastLight) {
+    defaultBg = '#ffffff';
+    defaultText = '#000000';
+    borderTop = 'border-t-2 border-black';
+  } else if (isHighContrastDark) {
+    defaultBg = '#000000';
+    defaultText = '#ffffff';
+    borderTop = 'border-t-2 border-white';
+  } else if (theme === 'midnight') {
+    defaultBg = '#0f172a';
+  } else if (theme === 'sepia') {
+    defaultBg = '#fdf6e3';
+    defaultText = '#433422';
+    borderTop = 'border-t border-[#e6dcc5]';
+  } else if (isDark) {
+     defaultBg = '#111827';
+  }
+
+  // UPDATED BACKGROUND LOGIC
+  let bgStyle = {};
+  if (data.backgroundImage) {
+      bgStyle = { backgroundImage: `url(${data.backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' };
+  } else if (data.backgroundType === 'linear') {
+      bgStyle = { backgroundImage: `linear-gradient(${data.bgDirection || 90}deg, ${data.gradientStart || '#ffffff'}, ${data.gradientEnd || '#000000'})` };
+  } else if (data.backgroundType === 'radial' || data.backgroundType === 'gradient') {
+      bgStyle = { backgroundImage: `radial-gradient(circle at center, ${data.gradientStart || '#ffffff'}, ${data.gradientEnd || '#000000'})` };
+  } else {
+      bgStyle = { backgroundColor: data.backgroundColor || defaultBg };
+  }
+  
+  const textColor = data.textColor || defaultText;
+  const parallaxClass = data.enableParallax ? 'bg-fixed' : '';
+
+  // Effects Classes
+  const grayscaleClass = data.enableGrayscale ? 'grayscale' : '';
+  const sepiaClass = data.enableSepia ? 'sepia' : '';
+  // Combine custom border with theme border
+  const borderClass = data.enableBorder ? 'border-t-8 border-gray-100/10' : borderTop;
+
+  const animationType = (data.animation || design?.animation || 'slide-up') as any;
+  const duration = design?.animationDuration || 'normal';
+
+  // Typography Styles
+  const headingStyle = getTypographyStyle(data.headingTypography, fontHeading);
+  const bodyStyle = getTypographyStyle(data.bodyTypography, fontBody);
+
+  return (
+    <footer 
+      onClick={(e) => { e.stopPropagation(); onSelect?.(); }}
+      className={`py-12 px-6 transition-colors duration-300 ${parallaxClass} ${borderClass} ${grayscaleClass} ${sepiaClass} relative cursor-pointer group ${isActive ? 'ring-4 ring-blue-500 ring-inset z-50' : ''}`}
+      style={{ ...bgStyle, color: textColor }}
+    >
+       <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-500/20 pointer-events-none transition-colors z-20"></div>
+
+       {data.backgroundImage && (
+          <div className="absolute inset-0 bg-black/80"></div>
+       )}
+      <Reveal enabled={enableAnimations} animation={animationType} duration={duration} className="relative z-10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+          <div className="mb-6 md:mb-0 max-w-md text-center md:text-left">
+            <h3 
+              className="text-xl font-bold mb-2" 
+              style={headingStyle}
+            >
+              {data.companyName}
+            </h3>
+            {data.description && (
+                <p 
+                  className="text-base opacity-80 mb-4 whitespace-pre-wrap"
+                  style={bodyStyle}
+                >
+                  {data.description}
+                </p>
+            )}
+            <p 
+              className="text-sm opacity-70"
+              style={bodyStyle}
+            >
+              {data.copyright}
+            </p>
+          </div>
+          
+          {/* Footer Links Wrapper with Fallback */}
+          <div className="footer-links-wrapper flex gap-8 justify-center md:justify-end">
+            {data.links && data.links.length > 0 ? (
+                data.links.map((link, idx) => (
+                  <a 
+                    key={idx} 
+                    href={link.href}
+                    onClick={(e) => e.preventDefault()} 
+                    className={`footer-link-item transition-colors ${isHighContrast ? 'underline hover:no-underline' : 'hover:opacity-70'}`}
+                    style={{ ...bodyStyle, color: isHighContrastLight ? 'black' : isHighContrastDark ? 'white' : (data.bodyTypography?.color || undefined) }}
+                  >
+                    {link.label}
+                  </a>
+                ))
+            ) : (
+                <span className="text-sm opacity-50 italic">Add links in the side panel...</span>
+            )}
+          </div>
+        </div>
+      </Reveal>
+    </footer>
+  );
+};
+
+export default Footer;

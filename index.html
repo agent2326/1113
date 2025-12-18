@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landing Page Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&family=Space+Mono:wght@400;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Lato:wght@300;400;700&family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;600;700&family=Poppins:wght@300;400;600;700&family=Raleway:wght@300;400;700&family=Merriweather:wght@300;400;700&family=Nunito:wght@400;700&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+      .font-serif { font-family: 'Playfair Display', serif; }
+      .font-mono { font-family: 'Space Mono', monospace; }
+      
+      /* Animation Utilities */
+      .reveal-section {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .reveal-section.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Hero Entrance Animations */
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes slideDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes zoomIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+      @keyframes zoomOut { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+      @keyframes blurIn { from { opacity: 0; filter: blur(20px); } to { opacity: 1; filter: blur(0); } }
+
+      .anim-fade-in { animation-name: fadeIn; animation-fill-mode: both; }
+      .anim-slide-up { animation-name: slideUp; animation-fill-mode: both; }
+      .anim-slide-down { animation-name: slideDown; animation-fill-mode: both; }
+      .anim-slide-left { animation-name: slideLeft; animation-fill-mode: both; }
+      .anim-slide-right { animation-name: slideRight; animation-fill-mode: both; }
+      .anim-zoom-in { animation-name: zoomIn; animation-fill-mode: both; }
+      .anim-zoom-out { animation-name: zoomOut; animation-fill-mode: both; }
+      .anim-blur-in { animation-name: blurIn; animation-fill-mode: both; }
+
+      .anim-fast { animation-duration: 0.5s; }
+      .anim-normal { animation-duration: 1s; }
+      .anim-slow { animation-duration: 2s; }
+      .anim-slow-3s { animation-duration: 3s; }
+      .anim-slow-4s { animation-duration: 4s; }
+      .anim-cinematic { animation-duration: 5s; }
+
+      /* Extended Visual Effects */
+      .effect-grayscale-to-color { filter: grayscale(100%); transition: filter 0.5s ease; }
+      .effect-grayscale-to-color:hover { filter: grayscale(0%); }
+
+      .effect-sepia { filter: sepia(100%); }
+
+      .effect-floating { animation: floating 3s ease-in-out infinite; }
+      @keyframes floating { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
+      .effect-glitch { animation: glitch 1s linear infinite; }
+      @keyframes glitch { 2%, 64% { transform: translate(2px,0) skew(0deg); } 4%, 60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
+
+      .effect-reflection { -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.4)); }
+
+      .effect-3d-tilt { transform: perspective(1000px) rotateY(15deg) rotateX(5deg); box-shadow: 10px 10px 20px rgba(0,0,0,0.3); transition: transform 0.5s ease; }
+      .effect-3d-tilt:hover { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+
+      .effect-border-gradient { border: 4px solid transparent; background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #f0abfc, #8b5cf6, #3b82f6) border-box; border-radius: 1rem; }
+
+      .effect-polaroid { background: white; padding: 1rem 1rem 4rem 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: rotate(-2deg); border-radius: 2px; transition: transform 0.3s; }
+      .effect-polaroid:hover { transform: rotate(0deg) scale(1.02); }
+
+      .effect-blob-shape { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; animation: blob-bounce 8s ease-in-out infinite; }
+      @keyframes blob-bounce { 0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } }
+
+      .effect-vignette { mask-image: radial-gradient(circle, black 50%, transparent 100%); -webkit-mask-image: radial-gradient(circle, black 50%, transparent 100%); }
+
+      /* Handheld / Floating Animation */
+      @keyframes handheld {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(4px, -6px) rotate(1deg); }
+        50% { transform: translate(-2px, 4px) rotate(-0.5deg); }
+        75% { transform: translate(-4px, -2px) rotate(0.5deg); }
+        100% { transform: translate(0, 0) rotate(0deg); }
+      }
+      .anim-handheld {
+        animation: handheld 8s ease-in-out infinite;
+        will-change: transform;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
+    "jszip": "https://esm.sh/jszip@3.10.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://esm.sh/vite@^7.2.7",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
